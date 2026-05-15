@@ -33,6 +33,23 @@
             overflow: hidden;
         }
 
+        #lyrics {
+  position: absolute;
+  bottom: 50px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Marck Script', cursive;
+            font-size: clamp(1.5rem, 7vw, 2.8rem);
+            color: #e2c93d;
+            -webkit-text-stroke: 1px white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            z-index: 100;
+            transition: opacity 0.5s ease;
+            padding: 0 10px;
+            box-sizing: border-box;
+  
+}
+
         .titulo-superior {
             position: absolute;
             top: 50px;
@@ -211,25 +228,97 @@ Pero si sientes por mí la mitad de lo que yo siento por ti, entonces intentémo
                     <br>No me gusta conversar tanto con la gente, pero contigo quiero hablar a diario. No me gusta gastar mi tiempo en cosas que no sean para mí, pero veo tus redes para saber que te gusta y así poder sorprenderte con algún detalle.
                     <br>Me haces reír, me encantan las cosas que me mandas y disfruto muchísimo el tiempo contigo.</p>
             </div>
-
+            
             <div class="pocket"></div>
             <div class="envelope"></div>
         </div>
+        
     </div>
+    <div id="lyrics"></div>
+    
 
     <script>
+
         const container = document.getElementById('mainContainer');
         const mensaje = document.getElementById('mensajeInicial');
         const music = document.getElementById("bgMusic");
+        
+        /*const lyrics = document.getElementById("lyrics");*/
+
+        const lyrics = [
+  { text: "Hey ojos bonitos, dónde has estado toda mi vida", time: 0 },
+  { text: "tantas noches te vi en sueños", time: 7 },
+  { text: "pero ahora eres toda mía", time: 14 },
+  { text: "piel de porcelana, bailas con locura", time: 18 },
+  { text: "sonrisa diabólica, te arrastras a la cama como una actriz", time: 26 },
+  { text: "y ahora me aferro fuerte", time: 32 },
+  { text: "porque eres mía", time: 36.5 },
+  { text: "Finalmente encontré a mi ángel", time: 42 },
+  { text: "Ella cayó en mi vida", time: 46},
+  { text: "Sin alas, sin luz, sin aureola", time: 49},
+  { text: "Solo esos ojos esmeraldas", time: 53},
+  { text: "Podría morir", time: 59},
+  { text: "Me aferro a mi ángel", time: 63},
+  { text: "Judith!", time: 69},
+];
+
+const lyricsBox = document.getElementById("lyrics");
+let index = 0;
+
         let clickCount = 0;
+        /*function showLyrics() {
+  phrases.forEach((phrase) => {
+    setTimeout(() => {
+      lyrics.style.opacity = 0;
+
+      setTimeout(() => {
+        lyrics.textContent = phrase.text;
+        lyrics.style.opacity = 1;
+      }, 1000);
+
+    }, phrase.time);
+  });
+}*/
+
+function changeLine(text) {
+  lyricsBox.style.opacity = 0;
+
+  setTimeout(() => {
+    lyricsBox.textContent = text;
+    lyricsBox.style.opacity = 1;
+  }, 200);
+}
+
+function syncLyrics() {
+  const t = music.currentTime;
+
+  // si el usuario retrocede la canción, reajustamos
+  while (index > 0 && t < lyrics[index].time) {
+    index--;
+  }
+
+  // avanzar letras según tiempo real
+  while (index < lyrics.length - 1 && t >= lyrics[index + 1].time) {
+    index++;
+  }
+
+  if (lyricsBox.textContent !== lyrics[index].text) {
+  changeLine(lyrics[index].text);
+}
+  
+
+  requestAnimationFrame(syncLyrics);
+}
+
 
          function startMusic() {
-    music.volume = 0.5; // volumen inicial
-    music.play();
+            music.volume = 0.5; // volumen inicial
+             music.play();
+             syncLyrics();
 
-    // Evita que vuelva a ejecutarse
-    document.removeEventListener("click", startMusic);
-  }
+            // Evita que vuelva a ejecutarse
+            document.removeEventListener("click", startMusic);
+        }
  // Reproduce la música después del primer clic
   document.addEventListener("click", startMusic);
 
