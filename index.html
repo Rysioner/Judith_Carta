@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marck+Script&display=swap" rel="stylesheet">
+
+    <title>Carta para Judith</title>
+    <style>
+        :root {
+            --color-sobre: #8B5A2B;
+            --color-sobre-oscuro: #6B3F1D;
+            --color-papel: url('img/pielantigua1.jpg');
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Centrado vertical */
+            align-items: center;     /* Centrado horizontal */
+            background-color: #1a120b;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        .titulo-superior {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            text-align: center;
+            font-family: 'Marck Script', cursive;
+            font-size: clamp(1.5rem, 7vw, 2.8rem);
+            color: #e2c9a1;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            z-index: 100;
+            transition: opacity 0.5s ease;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        /* Contenedor principal responsivo */
+        .scene {
+            position: relative;
+            width: 90%;
+            max-width: 350px; /* Tamaño máximo en PC */
+            aspect-ratio: 350 / 250; /* Mantiene la forma del sobre */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* SOBRE */
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: var(--color-sobre);
+            border-radius: 0 0 10px 10px;
+            z-index: 10;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* SOLAPA - Ahora usa % para ser responsiva */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-top: 130px solid var(--color-sobre-oscuro);
+            z-index: 40;
+            transform-origin: top;
+            transition: transform 0.5s ease;
+        }
+
+        /* BOLSILLO - Ahora usa % para ser responsivo */
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 175px solid var(--color-sobre);
+            border-right: 175px solid var(--color-sobre);
+            border-bottom: 125px solid var(--color-sobre);
+            border-top: 125px solid transparent;
+            z-index: 30;
+        }
+
+        /* Ajuste de los triángulos para que no se desborden en móviles pequeños */
+        @media (max-width: 400px) {
+            .flap {
+                border-left-width: 45vw;
+                border-right-width: 45vw;
+                border-top-width: 33vw;
+            }
+            .pocket {
+                border-left-width: 45vw;
+                border-right-width: 45vw;
+                border-bottom-width: 31vw;
+                border-top-width: 31vw;
+            }
+        }
+
+        /* HOJAS */
+        .letter-page {
+            position: absolute;
+            left: 5%;
+            bottom: 5%;
+            top: 5%;
+            width: 90%;
+            height: 160%;
+            background-image: var(--color-papel);
+             /*radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px)*/
+            background-size:cover;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-radius: 2px 10px 2px 10px;
+            opacity: 0; /* Ocultas al inicio */
+        }
+
+        .letter-page h2 { font-family: "Marck Script", cursive; color: #5d3a1a; text-align: center; margin: 0; font-size: 1.3rem; }
+        .letter-page p { font-family: "Marck Script", cursive; font-size: clamp(15px, 3.8vw, 13px); line-height: 1.4; color: #3B2413; margin-top: 10px; }
+
+        .seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 45px;
+            height: 45px;
+            background: #C74B3A;
+            border-radius: 50%;
+            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            transition: opacity 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .seal::after { content: "♥"; color: #5FAF5F; font-size: 25px; }
+
+        /* ANIMACIONES */
+        .step-1 .flap { transform: rotateX(180deg); z-index: 5; }
+        .step-1 .seal { opacity: 0; pointer-events: none; }
+        .step-1 .page-1 { opacity: 1; transform: translateY(-55%); z-index: 60; }
+
+        .step-2 .flap { transform: rotateX(180deg); z-index: 5; }
+        .step-2 .page-1 { opacity: 1; transform: translateY(-35%) translateX(-12%) rotate(-8deg); z-index: 55; }
+        .step-2 .page-2 { opacity: 1; transform: translateY(-60%); z-index: 60; }
+
+        .step-3 .flap { transform: rotateX(180deg); z-index: 5; }
+        .step-3 .page-1 { opacity: 1; transform: translateY(-25%) translateX(-20%) rotate(-12deg); z-index: 55; }
+        .step-3 .page-2 { opacity: 1; transform: translateY(-30%) translateX(18%) rotate(8deg); z-index: 58; }
+        .step-3 .page-3 { opacity: 1; transform: translateY(-65%); z-index: 60; }
+    </style>
+</head>
+<body>
+
+    <div class="titulo-superior" id="mensajeInicial">Judith, esta carta es para ti!! :3
+        Lo hice con mucho cariño, para mi chica especial!
+    </div>
+
+    <div class="scene">
+        <div class="envelope-container" id="mainContainer">
+            <div class="flap"></div>
+            <div class="seal"></div>
+            
+            <div class="letter-page page-3">
+                <p>Sabes que estoy enamorado de ti y estoy seguro de lo que siento. Por eso quiero ser tu apoyo, quiero ser el que te comprenda. Quiero tu corazón y quiero darte todo el cariño que llevo dentro de mí.
+<br>Quiero ser alguien que te haga sentir amada de verdad, alguien atento, leal y que siempre te haga sentir segura de lo que siento por ti.
+<br><br>Si aún después de todo, tú no quieres andar conmigo o no te interesa, yo no puedo hacer nada.
+Pero si sientes por mí la mitad de lo que yo siento por ti, entonces intentémoslo.
+<br>Así que… ¿puedo ser tu novio?
+                     <br><br><b>Espero tu respuesta por whatsapp, ahhh!</b></p>
+            </div>
+
+            <div class="letter-page page-2">
+                <p>La verdad es que me haces muchísimo más feliz de lo que logro expresar con palabras. A veces siento que me quedo corto diciendo lo que siento por ti.
+<br>Me gustaría dar el siguiente paso, porque quiero poder expresarte mis sentimientos sin miedo y demostrarte todo el cariño que te tengo. Creo que, poco a poco, me estoy enamorando de ti.
+<br>Siempre quiero estar para ti, verte feliz y compartir muchos momentos contigo. Cuando pienso en ti, no imagino algo pasajero. Me gustaría construir algo lindo contigo, algo que pueda durar toda la vida. Porque, sinceramente, no he conocido a nadie que me haga sentir lo que tú me haces sentir.</p>
+            </div>
+
+            <div class="letter-page page-1">
+                <h2>Para Mi Gatita</h2>
+                <p>Hola! Te escribo esto porque quiero expresarte mis sentimientos.
+                    <br>Desde que te conocí, sentí una conexión que jamás había sentido con nadie. Me contaste sobre tu vida y poco a poco te fui conociendo más; nuestra química es innegable.
+                    <br>No me gusta conversar tanto con la gente, pero contigo quiero hablar a diario. No me gusta gastar mi tiempo en cosas que no sean para mí, pero veo tus redes para saber que te gusta y así poder sorprenderte con algún detalle.
+                    <br>Me haces reír, me encantan las cosas que me mandas y disfruto muchísimo el tiempo contigo.</p>
+            </div>
+
+            <div class="pocket"></div>
+            <div class="envelope"></div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('mainContainer');
+        const mensaje = document.getElementById('mensajeInicial');
+        let clickCount = 0;
+
+        container.addEventListener('click', () => {
+            clickCount++;
+
+            if (clickCount === 1) {
+                container.classList.add('step-1');
+                mensaje.style.opacity = '0';
+                mensaje.style.pointerEvents = 'none';
+            } 
+            else if (clickCount === 2) {
+                container.classList.replace('step-1', 'step-2');
+            } 
+            else if (clickCount === 3) {
+                container.classList.replace('step-2', 'step-3');
+            } 
+            else {
+                container.classList.remove('step-3');
+                mensaje.style.opacity = '1';
+                clickCount = 0;
+            }
+        });
+    </script>
+</body>
+</html>
